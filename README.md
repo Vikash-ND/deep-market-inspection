@@ -10,9 +10,7 @@ Search any company by name, view live price data, and get technical indicator si
 
 \## 🚀 Live Demo
 
-\[View Live App](#) <!-- replace with your Render URL after deploying -->
-
-
+[View Live App](https://deep-market-inspection.onrender.com)
 
 \## ✨ Features
 
