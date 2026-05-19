@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 from app.data import get_stock_info, get_stock_history, get_multiple_stocks
+from app.analysis import get_full_analysis
 
 router = APIRouter()
 
@@ -19,6 +20,16 @@ def stock_history(
         return get_stock_history(ticker, period)
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+@router.get("/stock/{ticker}/analysis")
+def stock_analysis(
+    ticker: str,
+    period: str = Query(default="6mo", enum=["3mo","6mo","1y","2y"])
+):
+    try:
+        return get_full_analysis(ticker, period)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/stocks/compare")
 def compare_stocks(
