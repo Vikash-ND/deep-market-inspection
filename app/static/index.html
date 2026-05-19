@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deep Market Inspection</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>📈 Deep Market Inspection</h1>
+    <p>Real-time stock analysis & technical indicators</p>
+  </header>
+
+  <main>
+    <!-- Search -->
+    <section class="search-box">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          id="ticker-input"
+          placeholder="Search company e.g. Apple, Tesla, Reliance..."
+          autocomplete="off"
+          oninput="onSearchInput(this.value)"
+        />
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+      <select id="period-select">
+        <option value="3mo">3 Months</option>
+        <option value="6mo" selected>6 Months</option>
+        <option value="1y">1 Year</option>
+        <option value="2y">2 Years</option>
+      </select>
+      <button id="search-btn" onclick="loadAnalysis()">Analyse</button>
+    </section>
+
+    <!-- Summary cards -->
+    <section class="cards" id="summary-cards" style="display:none">
+      <div class="card">
+        <p class="card-label">Ticker</p>
+        <p class="card-value" id="card-ticker">--</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Company</p>
+        <p class="card-value" id="card-name" style="font-size:15px">--</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Latest Price</p>
+        <p class="card-value" id="card-price">--</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Overall Signal</p>
+        <p class="card-value" id="card-summary">--</p>
+      </div>
+      <div class="card">
+        <p class="card-label">Period</p>
+        <p class="card-value" id="card-period">--</p>
+      </div>
+    </section>
+
+    <!-- Signals -->
+    <section id="signals-section" style="display:none">
+      <h2>Indicator Signals</h2>
+      <div class="signals-grid" id="signals-grid"></div>
+    </section>
+
+    <!-- Charts -->
+    <section id="charts-section" style="display:none">
+      <h2>Candlestick Chart</h2>
+      <div id="candlestick-chart"></div>
+
+      <h2>RSI</h2>
+      <div id="rsi-chart"></div>
+
+      <h2>MACD</h2>
+      <div id="macd-chart"></div>
+
+      <h2>Bollinger Bands</h2>
+      <div id="bb-chart"></div>
+    </section>
+
+    <!-- Loading & Error -->
+    <div id="loading" style="display:none">⏳ Fetching data...</div>
+    <div id="error-msg" style="display:none" class="error"></div>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

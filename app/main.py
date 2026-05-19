@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.routers import router
 from app.cache import init_db
 
@@ -21,11 +23,8 @@ def startup():
     init_db()
 
 app.include_router(router, prefix="/api/v1")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/")
 def root():
-    return {
-        "message": "Deep Market Inspection API is running",
-        "version": "2.0.0",
-        "docs": "/docs"
-    }
+    return FileResponse("app/static/index.html")

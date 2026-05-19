@@ -1,8 +1,31 @@
 from fastapi import APIRouter, HTTPException, Query
 from app.data import get_stock_info, get_stock_history, get_multiple_stocks
 from app.analysis import get_full_analysis
+import yfinance as yf
 
 router = APIRouter()
+
+@router.get("/search")
+def search_tickers(q: str = Query(..., description="Company name to search")):
+    try:
+        result = yf.Search(q, max_results=6)
+        quotes = result.quotes
+        suggestions = []
+        for item in quotes:
+            symbol = item.get("symbol", "")
+            name   = item.get("longname") or item.get("shortname", "")
+            etype  = item.get("quoteType", "")
+            exchange = item.get("exchange", "")
+            if symbol and name:
+                suggestions.append({
+                    "symbol": symbol,
+                    "name": name,
+                    "type": etype,
+                    "exchange": exchange
+                })
+        return suggestions
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/stock/{ticker}")
 def stock_info(ticker: str):
