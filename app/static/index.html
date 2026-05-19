@@ -8,52 +8,116 @@
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <header>
-    <h1>📈 Deep Market Inspection</h1>
-    <p>Real-time stock analysis & technical indicators</p>
+
+  <!-- Background -->
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <canvas id="candle-canvas"></canvas>
+
+  <!-- Header -->
+  <header class="glass-header">
+   <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">📈</span>
+        <div>
+          <h1>Deep Market Inspection</h1>
+          <p>Real-time stock analysis & technical indicators</p>
+        </div>
+      </div>
+      <div class="header-search">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="ticker-input"
+            placeholder="Search company..."
+            autocomplete="off"
+            oninput="onSearchInput(this.value)"
+          />
+          <div class="suggestions" id="suggestions"></div>
+        </div>
+        <select id="period-select">
+          <option value="3mo">3M</option>
+          <option value="6mo" selected>6M</option>
+          <option value="1y">1Y</option>
+          <option value="2y">2Y</option>
+        </select>
+        <button onclick="loadAnalysis()">Analyse ↗</button>
+      </div>
+      <div class="header-right">
+        <div class="clock" id="clock"></div>
+        <div class="header-badge">● LIVE</div>
+      </div>
+    </div>
   </header>
 
+  <!-- Ticker tape -->
+  <div class="ticker-tape">
+    <div class="ticker-track" id="ticker-track">
+      <span class="ticker-loading">Loading market data...</span>
+    </div>
+  </div>
+
   <main>
-    <!-- Search -->
-    <section class="search-box">
-      <div class="search-wrapper">
-        <input
-          type="text"
-          id="ticker-input"
-          placeholder="Search company e.g. Apple, Tesla, Reliance..."
-          autocomplete="off"
-          oninput="onSearchInput(this.value)"
-        />
-        <div class="suggestions" id="suggestions"></div>
+
+    <!-- Hero slogan -->
+    <section class="hero">
+      <div class="slogan-carousel" id="slogan-carousel">
+        <p class="slogan active">"The market is a device for transferring money from the impatient to the patient." — Warren Buffett</p>
+        <p class="slogan">"Risk comes from not knowing what you're doing." — Warren Buffett</p>
+        <p class="slogan">"In investing, what is comfortable is rarely profitable." — Robert Arnott</p>
+        <p class="slogan">"The stock market is filled with individuals who know the price of everything, but the value of nothing." — Philip Fisher</p>
+        <p class="slogan">"It's not whether you're right or wrong, but how much money you make when you're right." — George Soros</p>
+        <p class="slogan">"Buy when there's blood in the streets." — Baron Rothschild</p>
       </div>
-      <select id="period-select">
-        <option value="3mo">3 Months</option>
-        <option value="6mo" selected>6 Months</option>
-        <option value="1y">1 Year</option>
-        <option value="2y">2 Years</option>
-      </select>
-      <button id="search-btn" onclick="loadAnalysis()">Analyse</button>
     </section>
 
+    <!-- Top stocks grid -->
+    <section class="top-stocks-section">
+      <div class="top-stocks-col">
+        <h3 class="col-title">🇮🇳 Top India Stocks</h3>
+        <div class="stock-list" id="india-stocks">
+          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div>
+        </div>
+      </div>
+      <div class="divider-v"></div>
+      <div class="top-stocks-col">
+        <h3 class="col-title">🇺🇸 Top US Stocks</h3>
+        <div class="stock-list" id="us-stocks">
+          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div>
+        </div>
+      </div>
+    </section>
+
+   
     <!-- Summary cards -->
     <section class="cards" id="summary-cards" style="display:none">
-      <div class="card">
+      <div class="glass-card stat-card">
         <p class="card-label">Ticker</p>
         <p class="card-value" id="card-ticker">--</p>
       </div>
-      <div class="card">
+      <div class="glass-card stat-card">
         <p class="card-label">Company</p>
         <p class="card-value" id="card-name" style="font-size:15px">--</p>
       </div>
-      <div class="card">
+      <div class="glass-card stat-card">
         <p class="card-label">Latest Price</p>
         <p class="card-value" id="card-price">--</p>
       </div>
-      <div class="card">
+      <div class="glass-card stat-card">
         <p class="card-label">Overall Signal</p>
         <p class="card-value" id="card-summary">--</p>
       </div>
-      <div class="card">
+      <div class="glass-card stat-card">
         <p class="card-label">Period</p>
         <p class="card-value" id="card-period">--</p>
       </div>
@@ -61,28 +125,34 @@
 
     <!-- Signals -->
     <section id="signals-section" style="display:none">
-      <h2>Indicator Signals</h2>
+      <h2 class="section-title">⚡ Indicator Signals</h2>
       <div class="signals-grid" id="signals-grid"></div>
     </section>
 
     <!-- Charts -->
     <section id="charts-section" style="display:none">
-      <h2>Candlestick Chart</h2>
-      <div id="candlestick-chart"></div>
-
-      <h2>RSI</h2>
-      <div id="rsi-chart"></div>
-
-      <h2>MACD</h2>
-      <div id="macd-chart"></div>
-
-      <h2>Bollinger Bands</h2>
-      <div id="bb-chart"></div>
+      <h2 class="section-title">🕯️ Candlestick Chart</h2>
+      <div class="glass-card chart-card" id="candlestick-chart"></div>
+      <div class="chart-row">
+        <div class="chart-half">
+          <h2 class="section-title">📊 RSI</h2>
+          <div class="glass-card chart-card" id="rsi-chart"></div>
+        </div>
+        <div class="chart-half">
+          <h2 class="section-title">📉 MACD</h2>
+          <div class="glass-card chart-card" id="macd-chart"></div>
+        </div>
+      </div>
+      <h2 class="section-title">🎯 Bollinger Bands</h2>
+      <div class="glass-card chart-card" id="bb-chart"></div>
     </section>
 
-    <!-- Loading & Error -->
-    <div id="loading" style="display:none">⏳ Fetching data...</div>
-    <div id="error-msg" style="display:none" class="error"></div>
+    <div id="loading" style="display:none">
+      <div class="loader-ring"></div>
+      <p>Fetching market data...</p>
+    </div>
+    <div id="error-msg" style="display:none" class="glass-card error"></div>
+
   </main>
 
   <script src="/static/app.js"></script>

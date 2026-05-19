@@ -3,8 +3,181 @@ let searchTimer = null;
 let selectedTicker = "";
 let selectedName = "";
 
+// ── Clock ──────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent =
+    now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Slogan carousel ────────────────────────────────
+const slogans = document.querySelectorAll(".slogan");
+let sloganIdx = 0;
+setInterval(() => {
+  slogans[sloganIdx].classList.remove("active");
+  sloganIdx = (sloganIdx + 1) % slogans.length;
+  slogans[sloganIdx].classList.add("active");
+}, 5000);
+
+// ── Animated candle background ─────────────────────
+(function () {
+  const canvas = document.getElementById("candle-canvas");
+  const ctx = canvas.getContext("2d");
+  let candles = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function makeCandle() {
+    const up = Math.random() > 0.5;
+    return {
+      x: Math.random() * canvas.width,
+      y: canvas.height + 100,
+      bodyH: 20 + Math.random() * 60,
+      wickH: 10 + Math.random() * 30,
+      width: 8 + Math.random() * 10,
+      speed: 0.4 + Math.random() * 0.6,
+      color: up ? "#22c55e" : "#ef4444",
+      alpha: 0.2 + Math.random() * 0.35
+    };
+  }
+
+  function drawCandle(c) {
+    ctx.globalAlpha = c.alpha;
+    ctx.strokeStyle = c.color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(c.x, c.y - c.bodyH - c.wickH);
+    ctx.lineTo(c.x, c.y + c.wickH);
+    ctx.stroke();
+    ctx.fillStyle = c.color;
+    ctx.fillRect(c.x - c.width / 2, c.y - c.bodyH, c.width, c.bodyH);
+    ctx.globalAlpha = 1;
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (candles.length < 18) candles.push(makeCandle());
+    candles.forEach(c => { c.y -= c.speed; });
+    candles = candles.filter(c => c.y + c.bodyH + c.wickH > 0);
+    candles.forEach(drawCandle);
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+  for (let i = 0; i < 14; i++) {
+    const c = makeCandle();
+    c.y = Math.random() * canvas.height;
+    candles.push(c);
+  }
+  loop();
+})();
+
+// ── Top stocks ─────────────────────────────────────
+const INDIA_TICKERS = [
+  "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS",
+  "ICICIBANK.NS", "WIPRO.NS", "ADANIENT.NS", "BAJFINANCE.NS"
+];
+const US_TICKERS = [
+  "AAPL", "MSFT", "NVDA", "GOOGL",
+  "AMZN", "META", "TSLA", "JPM"
+];
+
+const INDIA_NAMES = {
+  "RELIANCE.NS": "Reliance Industries",
+  "TCS.NS": "Tata Consultancy",
+  "HDFCBANK.NS": "HDFC Bank",
+  "INFY.NS": "Infosys",
+  "ICICIBANK.NS": "ICICI Bank",
+  "WIPRO.NS": "Wipro",
+  "ADANIENT.NS": "Adani Enterprises",
+  "BAJFINANCE.NS": "Bajaj Finance"
+};
+const US_NAMES = {
+  "AAPL": "Apple", "MSFT": "Microsoft",
+  "NVDA": "Nvidia", "GOOGL": "Alphabet",
+  "AMZN": "Amazon", "META": "Meta",
+  "TSLA": "Tesla", "JPM": "JPMorgan"
+};
+
+async function fetchStockRow(ticker, nameMap) {
+  try {
+    const res = await fetch(`${API}/stock/${ticker}`);
+    const data = await res.json();
+    const price = data.price ? parseFloat(data.price).toFixed(2) : "N/A";
+    const name = nameMap[ticker] || data.name || ticker;
+    const sym = ticker.replace(".NS", "").replace(".BO", "");
+    const currency = ticker.endsWith(".NS") || ticker.endsWith(".BO") ? "₹" : "$";
+    return { sym, name, price: `${currency}${price}`, ticker };
+  } catch {
+    return null;
+  }
+}
+
+function renderStockList(elId, items) {
+  const el = document.getElementById(elId);
+  el.innerHTML = items.map((item, i) => {
+    if (!item) return "";
+    return `
+      <div class="stock-row" style="animation-delay:${i * 80}ms"
+           onclick="quickLoad('${item.ticker}', '${item.name.replace(/'/g, "")}')">
+        <div class="stock-left">
+          <span class="stock-sym">${item.sym}</span>
+          <span class="stock-name">${item.name}</span>
+        </div>
+        <div class="stock-right">
+          <span class="stock-price">${item.price}</span>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function quickLoad(ticker, name) {
+  selectedTicker = ticker;
+  selectedName = name;
+  document.getElementById("ticker-input").value = `${ticker} — ${name}`;
+  document.getElementById("suggestions").innerHTML = "";
+  loadAnalysis();
+  window.scrollTo({
+    top: document.querySelector(".search-box").offsetTop - 100,
+    behavior: "smooth"
+  });
+}
+
+function buildTicker(items) {
+  const track = document.getElementById("ticker-track");
+  const valid = items.filter(Boolean);
+  if (!valid.length) return;
+  const html = valid.map(item =>
+    `<span class="ticker-item">
+      <span class="ticker-symbol">${item.sym}</span>
+      <span class="ticker-price">${item.price}</span>
+    </span>`
+  ).join("");
+  track.innerHTML = html + html;
+}
+
+async function loadTopStocks() {
+  const [indiaResults, usResults] = await Promise.all([
+    Promise.all(INDIA_TICKERS.map(t => fetchStockRow(t, INDIA_NAMES))),
+    Promise.all(US_TICKERS.map(t => fetchStockRow(t, US_NAMES)))
+  ]);
+  renderStockList("india-stocks", indiaResults);
+  renderStockList("us-stocks", usResults);
+  buildTicker([...indiaResults, ...usResults]);
+}
+
+loadTopStocks();
+
+// ── Search autocomplete ────────────────────────────
 async function onSearchInput(value) {
   const box = document.getElementById("suggestions");
+  selectedTicker = "";
   if (value.length < 2) { box.innerHTML = ""; return; }
 
   clearTimeout(searchTimer);
@@ -13,9 +186,9 @@ async function onSearchInput(value) {
       const res = await fetch(`${API}/search?q=${encodeURIComponent(value)}`);
       const results = await res.json();
       if (!results.length) { box.innerHTML = ""; return; }
-
       box.innerHTML = results.map(r => `
-        <div class="suggestion-item" onclick="selectTicker('${r.symbol}', '${r.name.replace(/'/g, "")}')">
+        <div class="suggestion-item"
+             onclick="selectTicker('${r.symbol}', '${r.name.replace(/'/g, "")}')">
           <span class="suggestion-symbol">${r.symbol}</span>
           <span class="suggestion-name">${r.name}</span>
           <span class="suggestion-exchange">${r.exchange}</span>
@@ -29,15 +202,16 @@ async function onSearchInput(value) {
 
 function selectTicker(symbol, name) {
   selectedTicker = symbol;
-  selectedName   = name;
+  selectedName = name;
   document.getElementById("ticker-input").value = `${symbol} — ${name}`;
   document.getElementById("suggestions").innerHTML = "";
 }
 
+// ── Main analysis loader ───────────────────────────
 async function loadAnalysis() {
   const inputVal = document.getElementById("ticker-input").value.trim();
-  const ticker   = selectedTicker || inputVal.split("—")[0].trim().toUpperCase();
-  const period   = document.getElementById("period-select").value;
+  const ticker = selectedTicker || inputVal.split("—")[0].trim().toUpperCase();
+  const period = document.getElementById("period-select").value;
 
   if (!ticker) { showError("Please enter or select a company."); return; }
 
@@ -56,14 +230,19 @@ async function loadAnalysis() {
   }
 }
 
+// ── Render results ─────────────────────────────────
 function render(data) {
-  document.getElementById("card-ticker").textContent  = data.ticker;
-  document.getElementById("card-name").textContent    = selectedName || data.ticker;
-  document.getElementById("card-price").textContent   = `$${data.latest_price}`;
+  const isIndian = selectedTicker.endsWith(".NS") || selectedTicker.endsWith(".BO");
+  const currency = isIndian ? "₹" : "$";
+
+  document.getElementById("card-ticker").textContent = data.ticker;
+  document.getElementById("card-name").textContent = selectedName || data.ticker;
+  document.getElementById("card-price").textContent = `${currency}${data.latest_price}`;
+
   const summaryEl = document.getElementById("card-summary");
   summaryEl.textContent = data.summary;
-  summaryEl.className   = data.summary;
-  document.getElementById("card-period").textContent  = data.period;
+  summaryEl.className = data.summary;
+  document.getElementById("card-period").textContent = data.period;
   document.getElementById("summary-cards").style.display = "grid";
 
   const grid = document.getElementById("signals-grid");
@@ -83,13 +262,14 @@ function render(data) {
   const closes = data.data.map(d => d.Close);
 
   const layout = {
-    paper_bgcolor: "#1a1d27",
-    plot_bgcolor:  "#1a1d27",
-    font:  { color: "#e0e0e0" },
-    xaxis: { gridcolor: "#2a2d3a" },
-    yaxis: { gridcolor: "#2a2d3a" },
-    margin: { t: 20, b: 40, l: 60, r: 20 },
-    height: 340
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor:  "rgba(0,0,0,0)",
+    font: { color: "#f0f0ff", family: "Segoe UI, sans-serif" },
+    xaxis: { gridcolor: "rgba(255,255,255,0.06)", zerolinecolor: "rgba(255,255,255,0.1)" },
+    yaxis: { gridcolor: "rgba(255,255,255,0.06)", zerolinecolor: "rgba(255,255,255,0.1)" },
+    margin: { t: 16, b: 40, l: 60, r: 20 },
+    height: 340,
+    legend: { bgcolor: "rgba(0,0,0,0)", font: { color: "#f0f0ff" } }
   };
 
   Plotly.newPlot("candlestick-chart", [{
@@ -97,7 +277,7 @@ function render(data) {
     x: dates, open: opens, high: highs, low: lows, close: closes,
     increasing: { line: { color: "#22c55e" } },
     decreasing: { line: { color: "#ef4444" } }
-  }], { ...layout, height: 400 });
+  }], { ...layout, height: 420 });
 
   Plotly.newPlot("rsi-chart", [
     { x: dates, y: data.data.map(d => d.RSI), type: "scatter", name: "RSI", line: { color: "#a78bfa" } },
@@ -106,7 +286,7 @@ function render(data) {
   ], layout);
 
   Plotly.newPlot("macd-chart", [
-    { x: dates, y: data.data.map(d => d.MACD),        type: "scatter", name: "MACD",   line: { color: "#4f8ef7" } },
+    { x: dates, y: data.data.map(d => d.MACD),        type: "scatter", name: "MACD",   line: { color: "#4fb8f7" } },
     { x: dates, y: data.data.map(d => d.MACD_signal), type: "scatter", name: "Signal", line: { color: "#f59e0b" } },
     { x: dates, y: data.data.map(d => d.MACD_diff),   type: "bar",     name: "Diff",   marker: { color: "#6366f1" } }
   ], layout);
@@ -121,6 +301,7 @@ function render(data) {
   document.getElementById("charts-section").style.display = "block";
 }
 
+// ── Helpers ────────────────────────────────────────
 function showLoading(on) {
   document.getElementById("loading").style.display = on ? "block" : "none";
 }
@@ -132,7 +313,7 @@ function showError(msg) {
 }
 
 function hideAll() {
-  ["summary-cards","signals-section","charts-section","error-msg"]
+  ["summary-cards", "signals-section", "charts-section", "error-msg"]
     .forEach(id => document.getElementById(id).style.display = "none");
 }
 
