@@ -9,15 +9,49 @@
 </head>
 <body>
 
-  <!-- Background -->
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
   <canvas id="candle-canvas"></canvas>
 
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="auth-modal" style="display:none">
+    <div class="modal glass-card">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login"  onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab"        data-tab="signup" onclick="switchTab('signup')">Create Account</button>
+      </div>
+
+      <!-- Login -->
+      <div id="login-form">
+        <h2 class="modal-title">Welcome back 👋</h2>
+        <input class="auth-input" id="login-email"    type="email"    placeholder="Email" />
+        <input class="auth-input" id="login-password" type="password" placeholder="Password" />
+        <p class="auth-error" id="login-error"></p>
+        <button class="auth-submit" onclick="handleLogin()">Sign In</button>
+        <p class="auth-switch">No account? <span onclick="switchTab('signup')">Create one</span></p>
+      </div>
+
+      <!-- Signup -->
+      <div id="signup-form" style="display:none">
+        <h2 class="modal-title">Create your account 🚀</h2>
+        <input class="auth-input" id="signup-username" type="text"     placeholder="Username" />
+        <input class="auth-input" id="signup-email"    type="email"    placeholder="Email" />
+        <input class="auth-input" id="signup-password" type="password" placeholder="Password (min 6 chars)" />
+        <p class="auth-error" id="signup-error"></p>
+        <button class="auth-submit" onclick="handleSignup()">Create Account</button>
+        <p class="auth-switch">Already have an account? <span onclick="switchTab('login')">Sign in</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
   <!-- Header -->
   <header class="glass-header">
-   <div class="header-inner">
+    <div class="header-inner">
       <div class="logo">
         <span class="logo-icon">📈</span>
         <div>
@@ -48,6 +82,12 @@
       <div class="header-right">
         <div class="clock" id="clock"></div>
         <div class="header-badge">● LIVE</div>
+        <button class="auth-login-btn" id="auth-login-btn" onclick="openModal('login')">Sign In</button>
+        <div class="auth-user-menu" id="auth-user-menu" style="display:none">
+          <span class="auth-avatar">👤</span>
+          <span id="auth-username"></span>
+          <button class="auth-logout-btn" onclick="logout()">Logout</button>
+        </div>
       </div>
     </div>
   </header>
@@ -61,7 +101,7 @@
 
   <main>
 
-    <!-- Hero slogan -->
+    <!-- Hero -->
     <section class="hero">
       <div class="slogan-carousel" id="slogan-carousel">
         <p class="slogan active">"The market is a device for transferring money from the impatient to the patient." — Warren Buffett</p>
@@ -73,15 +113,13 @@
       </div>
     </section>
 
-    <!-- Top stocks grid -->
+    <!-- Top stocks -->
     <section class="top-stocks-section">
       <div class="top-stocks-col">
         <h3 class="col-title">🇮🇳 Top India Stocks</h3>
         <div class="stock-list" id="india-stocks">
-          <div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div><div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div><div class="stock-skeleton"></div>
           <div class="stock-skeleton"></div>
         </div>
       </div>
@@ -89,16 +127,31 @@
       <div class="top-stocks-col">
         <h3 class="col-title">🇺🇸 Top US Stocks</h3>
         <div class="stock-list" id="us-stocks">
-          <div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div><div class="stock-skeleton"></div>
+          <div class="stock-skeleton"></div><div class="stock-skeleton"></div>
           <div class="stock-skeleton"></div>
         </div>
       </div>
     </section>
 
-   
+    <!-- User panel -->
+    <section class="glass-card user-panel" id="user-panel" style="display:none">
+      <div class="user-panel-tabs">
+        <button class="upanel-tab active" onclick="switchPanelTab('watchlist')">⭐ Watchlist</button>
+        <button class="upanel-tab"        onclick="switchPanelTab('history')">🕐 History</button>
+        <button class="upanel-tab"        onclick="switchPanelTab('notes')">📝 Notes</button>
+      </div>
+      <div id="panel-watchlist" class="panel-section">
+        <div id="watchlist-items"></div>
+      </div>
+      <div id="panel-history" class="panel-section" style="display:none">
+        <div id="history-items"></div>
+      </div>
+      <div id="panel-notes" class="panel-section" style="display:none">
+        <div id="notes-items"></div>
+      </div>
+    </section>
+
     <!-- Summary cards -->
     <section class="cards" id="summary-cards" style="display:none">
       <div class="glass-card stat-card">
@@ -122,6 +175,15 @@
         <p class="card-value" id="card-period">--</p>
       </div>
     </section>
+
+    <!-- Action buttons (after analysis) -->
+    <div class="action-bar" id="action-bar" style="display:none">
+      <button class="action-btn" onclick="addToWatchlist(selectedTicker, selectedName)">⭐ Add to Watchlist</button>
+      <div class="note-box">
+        <textarea id="note-input" placeholder="Write a note about this stock..."></textarea>
+        <button class="action-btn" onclick="saveNote(selectedTicker, document.getElementById('note-input').value)">💾 Save Note</button>
+      </div>
+    </div>
 
     <!-- Signals -->
     <section id="signals-section" style="display:none">
@@ -155,6 +217,7 @@
 
   </main>
 
+  <script src="/static/auth.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

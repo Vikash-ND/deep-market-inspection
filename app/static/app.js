@@ -299,6 +299,8 @@ function render(data) {
   ], layout);
 
   document.getElementById("charts-section").style.display = "block";
+document.getElementById("action-bar").style.display = "flex";
+  saveHistory(data.ticker, data.period, data.summary);
 }
 
 // ── Helpers ────────────────────────────────────────
@@ -313,8 +315,17 @@ function showError(msg) {
 }
 
 function hideAll() {
-  ["summary-cards", "signals-section", "charts-section", "error-msg"]
+  ["summary-cards", "signals-section", "charts-section", "error-msg", "action-bar"]
     .forEach(id => document.getElementById(id).style.display = "none");
+}
+
+function switchPanelTab(tab) {
+  ["watchlist","history","notes"].forEach(t => {
+    document.getElementById(`panel-${t}`).style.display = t === tab ? "block" : "none";
+  });
+  document.querySelectorAll(".upanel-tab").forEach((btn, i) => {
+    btn.classList.toggle("active", ["watchlist","history","notes"][i] === tab);
+  });
 }
 
 document.addEventListener("click", e => {
