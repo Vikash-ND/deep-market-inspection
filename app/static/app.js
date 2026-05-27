@@ -107,18 +107,17 @@ const US_NAMES = {
 
 async function fetchStockRow(ticker, nameMap) {
   try {
-    const res = await fetch(`${API}/stock/${ticker}`);
-    const data = await res.json();
-    const price = data.price ? parseFloat(data.price).toFixed(2) : "N/A";
-    const name = nameMap[ticker] || data.name || ticker;
-    const sym = ticker.replace(".NS", "").replace(".BO", "");
+    const res    = await fetch(`${API}/stock/${ticker}/price`);
+    const data   = await res.json();
     const currency = ticker.endsWith(".NS") || ticker.endsWith(".BO") ? "₹" : "$";
-    return { sym, name, price: `${currency}${price}`, ticker };
+    const price  = data.price ? `${currency}${parseFloat(data.price).toFixed(2)}` : "N/A";
+    const name   = nameMap[ticker] || ticker;
+    const sym    = ticker.replace(".NS","").replace(".BO","");
+    return { sym, name, price, ticker };
   } catch {
     return null;
   }
 }
-
 function renderStockList(elId, items) {
   const el = document.getElementById(elId);
   el.innerHTML = items.map((item, i) => {

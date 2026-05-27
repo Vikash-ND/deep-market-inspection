@@ -34,6 +34,14 @@ def stock_info(ticker: str):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+@router.get("/stock/{ticker}/price")
+def quick_price(ticker: str):
+    from app.data import get_quick_price
+    result = get_quick_price(ticker)
+    if not result:
+        return {"price": None}
+    return result
+
 @router.get("/stock/{ticker}/history")
 def stock_history(
     ticker: str,
