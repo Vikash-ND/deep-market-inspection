@@ -38,5 +38,12 @@ app.include_router(user_router, prefix="/api/v1")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/")
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "version": "3.0.0",
+        "database": "connected"
+    }
 def root():
     return FileResponse("app/static/index.html")
