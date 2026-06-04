@@ -75,3 +75,22 @@ def compare_stocks(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/stock/{ticker}/news")
+def stock_news(ticker: str):
+    try:
+        stock = yf.Ticker(ticker)
+        news  = stock.news
+        result = []
+        for item in news[:8]:
+            content = item.get("content", {})
+            result.append({
+                "title":     content.get("title", ""),
+                "summary":   content.get("summary", ""),
+                "url":       content.get("canonicalUrl", {}).get("url", ""),
+                "published": content.get("pubDate", ""),
+                "source":    content.get("provider", {}).get("displayName", "")
+            })
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

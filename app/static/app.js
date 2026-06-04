@@ -300,6 +300,7 @@ function render(data) {
   document.getElementById("charts-section").style.display = "block";
 document.getElementById("action-bar").style.display = "flex";
   saveHistory(data.ticker, data.period, data.summary);
+loadNews(data.ticker);
 }
 
 // ── Helpers ────────────────────────────────────────
@@ -336,3 +337,18 @@ document.addEventListener("click", e => {
 document.getElementById("ticker-input").addEventListener("keydown", e => {
   if (e.key === "Enter") loadAnalysis();
 });
+async function loadNews(ticker) {
+  try {
+    const res   = await fetch(`${API}/stock/${ticker}/news`);
+    const items = await res.json();
+    const grid  = document.getElementById("news-section");
+    if (!items.length) { grid.innerHTML = ""; return; }
+    grid.innerHTML = items.map(n => `
+      <a class="news-card glass-card" href="${n.url}" target="_blank" rel="noopener">
+        <p class="news-source">${n.source}</p>
+        <p class="news-title">${n.title}</p>
+        <p class="news-summary">${n.summary}</p>
+      </a>
+    `).join("");
+  } catch { }
+}
