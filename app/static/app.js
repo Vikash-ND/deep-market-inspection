@@ -242,6 +242,19 @@ function render(data) {
   summaryEl.textContent = data.summary;
   summaryEl.className = data.summary;
   document.getElementById("card-period").textContent = data.period;
+const chgEl = document.getElementById("card-change");
+  if (chgEl) {
+    if (data.change_pct !== null && data.change_pct !== undefined) {
+      chgEl.textContent = `${data.change_pct > 0 ? "+" : ""}${data.change_pct}%`;
+      chgEl.style.color = data.change_pct > 0
+        ? "var(--green)"
+        : data.change_pct < 0
+        ? "var(--red)"
+        : "var(--amber)";
+    } else {
+      chgEl.textContent = "N/A";
+    }
+  }
   document.getElementById("summary-cards").style.display = "grid";
 
   const grid = document.getElementById("signals-grid");
