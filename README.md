@@ -26,6 +26,19 @@ Search any company by name, view live price data, and get technical indicator si
 
 \- 🌐 REST API with auto-generated Swagger docs
 
+\- 📰 Live stock news feed per ticker
+
+\- 📊 Price change percentage display
+
+\- 🔐 Full user authentication (signup, login, Google OAuth)
+
+\- ⭐ Personal watchlist per user
+
+\- 📝 Stock notes and analysis history
+
+\- 🛡️ Rate limiting for API protection
+
+\- 🗺️ SEO optimized with sitemap and meta tags
 
 
 \## 🛠️ Tech Stack
