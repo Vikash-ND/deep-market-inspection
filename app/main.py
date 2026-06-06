@@ -52,3 +52,7 @@ def analysis_page(ticker: str):
 @app.get("/")
 def root():
     return FileResponse("app/static/index.html")
+
+@app.get("/compare")
+def compare_page():
+    return FileResponse("app/static/compare.html")

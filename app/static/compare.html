@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compare Stocks — Deep Market Inspection</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+</head>
+<body>
+
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <canvas id="candle-canvas"></canvas>
+  <div id="progress-bar"></div>
+  <div class="toast" id="toast"></div>
+
+  <header class="glass-header">
+    <div class="header-inner">
+      <a href="/" class="logo" style="text-decoration:none">
+        <span class="logo-icon">📈</span>
+        <div>
+          <h1>Deep Market Inspection</h1>
+          <p>Real-time stock analysis & technical indicators</p>
+        </div>
+      </a>
+      <div class="header-right">
+        <div class="clock" id="clock"></div>
+        <div class="header-badge">● LIVE</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="back-bar">
+      <a href="/" class="back-btn">← Back to Home</a>
+      <span class="analysis-breadcrumb">Stock Comparison</span>
+    </div>
+
+    <!-- Input section -->
+    <section class="glass-card compare-input-card">
+      <h2 class="compare-title">⚔️ Compare Stocks</h2>
+      <p class="compare-subtitle">Enter up to 3 tickers to compare side by side</p>
+      <div class="compare-inputs">
+        <input class="compare-ticker-input" id="t1" type="text" placeholder="Ticker 1 e.g. AAPL" />
+        <input class="compare-ticker-input" id="t2" type="text" placeholder="Ticker 2 e.g. MSFT" />
+        <input class="compare-ticker-input" id="t3" type="text" placeholder="Ticker 3 (optional)" />
+        <select class="compare-period" id="compare-period">
+          <option value="3mo">3 Months</option>
+          <option value="6mo" selected>6 Months</option>
+          <option value="1y">1 Year</option>
+          <option value="2y">2 Years</option>
+        </select>
+        <button class="compare-btn" onclick="runComparison()">Compare ↗</button>
+      </div>
+    </section>
+
+    <div id="compare-loading" style="display:none">
+      <div class="loader-ring"></div>
+      <p>Fetching comparison data...</p>
+    </div>
+
+    <div id="compare-error" style="display:none" class="glass-card error"></div>
+
+    <!-- Results -->
+    <section id="compare-results" style="display:none">
+
+      <!-- Stats table -->
+      <h2 class="section-title">📊 Side by Side Stats</h2>
+      <div class="compare-table-wrap glass-card">
+        <table class="compare-table" id="compare-table"></table>
+      </div>
+
+      <!-- Price chart -->
+      <h2 class="section-title">📈 Price History</h2>
+      <div class="glass-card chart-card" id="compare-price-chart"></div>
+
+      <!-- RSI chart -->
+      <h2 class="section-title">📊 RSI Comparison</h2>
+      <div class="glass-card chart-card" id="compare-rsi-chart"></div>
+
+      <!-- Signals comparison -->
+      <h2 class="section-title">⚡ Signal Comparison</h2>
+      <div id="compare-signals" class="compare-signals-grid"></div>
+
+    </section>
+  </main>
+
+  <script src="/static/compare.js"></script>
+</body>
+</html>
