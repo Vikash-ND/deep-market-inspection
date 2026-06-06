@@ -45,6 +45,10 @@ def health():
         "database": "connected"
     }
 
+@app.get("/analysis/{ticker}")
+def analysis_page(ticker: str):
+    return FileResponse("app/static/analysis.html")
+
 @app.get("/")
 def root():
     return FileResponse("app/static/index.html")

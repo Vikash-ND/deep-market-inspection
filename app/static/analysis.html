@@ -3,30 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Deep Market Inspection</title>
-
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
-
-  <!-- SEO -->
-  <meta name="description" content="Real-time stock market analysis platform with RSI, MACD, Bollinger Bands and AI-powered signals for Indian and US stocks." />
-  <meta name="keywords" content="stock market, technical analysis, NSE, BSE, RSI, MACD, investing" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Deep Market Inspection" />
-  <meta property="og:description" content="Real-time stock analysis with technical indicators" />
-  <meta property="og:url" content="https://deep-market-inspection.onrender.com" />
-
-  <!-- Styles -->
+  <title>Analysis — Deep Market Inspection</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
 </head>
-<body><div id="progress-bar"></div>
+<body>
 
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
   <canvas id="candle-canvas"></canvas>
+  <div id="progress-bar"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
 
   <!-- Auth Modal -->
   <div class="modal-overlay" id="auth-modal" style="display:none">
@@ -36,8 +27,6 @@
         <button class="auth-tab active" data-tab="login"  onclick="switchTab('login')">Sign In</button>
         <button class="auth-tab"        data-tab="signup" onclick="switchTab('signup')">Create Account</button>
       </div>
-
-      <!-- Login -->
       <div id="login-form">
         <h2 class="modal-title">Welcome back 👋</h2>
         <input class="auth-input" id="login-email"    type="email"    placeholder="Email" />
@@ -46,8 +35,6 @@
         <button class="auth-submit" onclick="handleLogin()">Sign In</button>
         <p class="auth-switch">No account? <span onclick="switchTab('signup')">Create one</span></p>
       </div>
-
-      <!-- Signup -->
       <div id="signup-form" style="display:none">
         <h2 class="modal-title">Create your account 🚀</h2>
         <input class="auth-input" id="signup-username" type="text"     placeholder="Username" />
@@ -60,19 +47,16 @@
     </div>
   </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
-
   <!-- Header -->
   <header class="glass-header">
     <div class="header-inner">
-      <div class="logo">
+      <a href="/" class="logo" style="text-decoration:none">
         <span class="logo-icon">📈</span>
         <div>
           <h1>Deep Market Inspection</h1>
           <p>Real-time stock analysis & technical indicators</p>
         </div>
-      </div>
+      </a>
       <div class="header-search">
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
@@ -106,99 +90,25 @@
     </div>
   </header>
 
-  <!-- Ticker tape -->
-  <div class="ticker-tape">
-    <div class="ticker-track" id="ticker-track">
-      <span class="ticker-loading">Loading market data...</span>
-    </div>
-  </div>
-
   <main>
 
-    <!-- Hero -->
-    <section class="hero">
-      <div class="slogan-carousel" id="slogan-carousel">
-        <p class="slogan active">"The market is a device for transferring money from the impatient to the patient." — Warren Buffett</p>
-        <p class="slogan">"Risk comes from not knowing what you're doing." — Warren Buffett</p>
-        <p class="slogan">"In investing, what is comfortable is rarely profitable." — Robert Arnott</p>
-        <p class="slogan">"The stock market is filled with individuals who know the price of everything, but the value of nothing." — Philip Fisher</p>
-        <p class="slogan">"It's not whether you're right or wrong, but how much money you make when you're right." — George Soros</p>
-        <p class="slogan">"Buy when there's blood in the streets." — Baron Rothschild</p>
-      </div>
-    </section>
-
-    <!-- Top stocks -->
-    <section class="top-stocks-section">
-      <div class="top-stocks-col">
-        <h3 class="col-title">🇮🇳 Top India Stocks</h3>
-        <div class="stock-list" id="india-stocks">
-          <div class="stock-skeleton"></div><div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div><div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div>
-        </div>
-      </div>
-      <div class="divider-v"></div>
-      <div class="top-stocks-col">
-        <h3 class="col-title">🇺🇸 Top US Stocks</h3>
-        <div class="stock-list" id="us-stocks">
-          <div class="stock-skeleton"></div><div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div><div class="stock-skeleton"></div>
-          <div class="stock-skeleton"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- User panel -->
-    <section class="glass-card user-panel" id="user-panel" style="display:none">
-      <div class="user-panel-tabs">
-        <button class="upanel-tab active" onclick="switchPanelTab('watchlist')">⭐ Watchlist</button>
-        <button class="upanel-tab"        onclick="switchPanelTab('history')">🕐 History</button>
-        <button class="upanel-tab"        onclick="switchPanelTab('notes')">📝 Notes</button>
-      </div>
-      <div id="panel-watchlist" class="panel-section">
-        <div id="watchlist-items"></div>
-      </div>
-      <div id="panel-history" class="panel-section" style="display:none">
-        <div id="history-items"></div>
-      </div>
-      <div id="panel-notes" class="panel-section" style="display:none">
-        <div id="notes-items"></div>
-      </div>
-    </section>
+    <!-- Back button -->
+    <div class="back-bar">
+      <a href="/" class="back-btn">← Back to Home</a>
+      <span class="analysis-breadcrumb" id="analysis-breadcrumb">Loading...</span>
+    </div>
 
     <!-- Summary cards -->
-    <section class="cards" id="summary-cards" style="display:none">
-      <div class="glass-card stat-card">
-        <p class="card-label">Ticker</p>
-        <p class="card-value" id="card-ticker">--</p>
-      </div>
-      <div class="glass-card stat-card">
-        <p class="card-label">Company</p>
-        <p class="card-value" id="card-name" style="font-size:15px">--</p>
-      </div>
-      <div class="glass-card stat-card">
-        <p class="card-label">Latest Price</p>
-        <p class="card-value" id="card-price">--</p>
-      </div>
-      <div class="glass-card stat-card">
-        <p class="card-label">Overall Signal</p>
-        <p class="card-value" id="card-summary">--</p>
-      </div>
-	<div class="glass-card stat-card">
-        <p class="card-label">Period</p>
-        <p class="card-value" id="card-period">--</p>
-      </div>
-      <div class="glass-card stat-card">
-        <p class="card-label">Period</p>
-        <p class="card-value" id="card-period">--</p>
-      </div>
-      <div class="glass-card stat-card">
-        <p class="card-label">Change</p>
-        <p class="card-value" id="card-change">--</p>
-      </div>
+    <section class="cards" id="summary-cards">
+      <div class="glass-card stat-card skeleton-card"></div>
+      <div class="glass-card stat-card skeleton-card"></div>
+      <div class="glass-card stat-card skeleton-card"></div>
+      <div class="glass-card stat-card skeleton-card"></div>
+      <div class="glass-card stat-card skeleton-card"></div>
+      <div class="glass-card stat-card skeleton-card"></div>
     </section>
 
-    <!-- Action buttons (after analysis) -->
+    <!-- Action bar -->
     <div class="action-bar" id="action-bar" style="display:none">
       <button class="action-btn" onclick="addToWatchlist(selectedTicker, selectedName)">⭐ Add to Watchlist</button>
       <div class="note-box">
@@ -229,9 +139,6 @@
       </div>
       <h2 class="section-title">🎯 Bollinger Bands</h2>
       <div class="glass-card chart-card" id="bb-chart"></div>
-	<h2 class="section-title">🎯 Bollinger Bands</h2>
-      <div class="glass-card chart-card" id="bb-chart"></div>
-
       <h2 class="section-title">📰 Latest News</h2>
       <div id="news-section" class="news-grid"></div>
     </section>
@@ -245,6 +152,6 @@
   </main>
 
   <script src="/static/auth.js"></script>
-  <script src="/static/app.js"></script>
+  <script src="/static/analysis.js"></script>
 </body>
 </html>

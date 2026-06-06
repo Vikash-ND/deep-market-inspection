@@ -1,4 +1,12 @@
-const API = window.location.origin + "/api/v1";
+const API = window.location.origin + "/api/v1";// ── Progress bar ───────────────────────────────────
+function setProgress(pct) {
+  const bar = document.getElementById("progress-bar");
+  if (!bar) return;
+  bar.style.width = pct + "%";
+  if (pct >= 100) {
+    setTimeout(() => { bar.style.width = "0%"; }, 400);
+  }
+}
 let searchTimer = null;
 let selectedTicker = "";
 let selectedName = "";
@@ -209,24 +217,10 @@ function selectTicker(symbol, name) {
 // ── Main analysis loader ───────────────────────────
 async function loadAnalysis() {
   const inputVal = document.getElementById("ticker-input").value.trim();
-  const ticker = selectedTicker || inputVal.split("—")[0].trim().toUpperCase();
-  const period = document.getElementById("period-select").value;
-
+  const ticker   = selectedTicker || inputVal.split("—")[0].trim().toUpperCase();
+  const period   = document.getElementById("period-select").value;
   if (!ticker) { showError("Please enter or select a company."); return; }
-
-  showLoading(true);
-  hideAll();
-
-  try {
-    const res = await fetch(`${API}/stock/${ticker}/analysis?period=${period}`);
-    if (!res.ok) throw new Error(`Could not find data for "${ticker}".`);
-    const data = await res.json();
-    render(data);
-  } catch (err) {
-    showError(err.message);
-  } finally {
-    showLoading(false);
-  }
+  window.location.href = `/analysis/${ticker}?period=${period}`;
 }
 
 // ── Render results ─────────────────────────────────

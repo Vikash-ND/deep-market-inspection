@@ -1,0 +1,242 @@
+const API = window.location.origin + "/api/v1";
+let selectedTicker = "";
+let selectedName   = "";
+let searchTimer    = null;
+
+// ── Clock ──────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const el  = document.getElementById("clock");
+  if (el) el.textContent = now.toLocaleTimeString("en-IN", {
+    hour: "2-digit", minute: "2-digit", second: "2-digit"
+  });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Candle background ──────────────────────────────
+(function () {
+  const canvas = document.getElementById("candle-canvas");
+  const ctx    = canvas.getContext("2d");
+  let candles  = [];
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  function makeCandle() {
+    const up = Math.random() > 0.5;
+    return { x: Math.random() * canvas.width, y: canvas.height + 100,
+      bodyH: 20 + Math.random() * 60, wickH: 10 + Math.random() * 30,
+      width: 8 + Math.random() * 10, speed: 0.4 + Math.random() * 0.6,
+      color: up ? "#22c55e" : "#ef4444", alpha: 0.2 + Math.random() * 0.35 };
+  }
+  function drawCandle(c) {
+    ctx.globalAlpha = c.alpha;
+    ctx.strokeStyle = c.color; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(c.x, c.y - c.bodyH - c.wickH);
+    ctx.lineTo(c.x, c.y + c.wickH); ctx.stroke();
+    ctx.fillStyle = c.color;
+    ctx.fillRect(c.x - c.width / 2, c.y - c.bodyH, c.width, c.bodyH);
+    ctx.globalAlpha = 1;
+  }
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (candles.length < 18) candles.push(makeCandle());
+    candles.forEach(c => { c.y -= c.speed; });
+    candles = candles.filter(c => c.y + c.bodyH + c.wickH > 0);
+    candles.forEach(drawCandle);
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+  for (let i = 0; i < 14; i++) { const c = makeCandle(); c.y = Math.random() * canvas.height; candles.push(c); }
+  loop();
+})();
+
+// ── Progress bar ───────────────────────────────────
+function setProgress(pct) {
+  const bar = document.getElementById("progress-bar");
+  if (!bar) return;
+  bar.style.width = pct + "%";
+  if (pct >= 100) setTimeout(() => { bar.style.width = "0%"; }, 400);
+}
+
+// ── Search ─────────────────────────────────────────
+async function onSearchInput(value) {
+  const box = document.getElementById("suggestions");
+  selectedTicker = "";
+  if (value.length < 2) { box.innerHTML = ""; return; }
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(async () => {
+    try {
+      const res     = await fetch(`${API}/search?q=${encodeURIComponent(value)}`);
+      const results = await res.json();
+      if (!results.length) { box.innerHTML = ""; return; }
+      box.innerHTML = results.map(r => `
+        <div class="suggestion-item" onclick="selectTicker('${r.symbol}','${r.name.replace(/'/g,"")}')">
+          <span class="suggestion-symbol">${r.symbol}</span>
+          <span class="suggestion-name">${r.name}</span>
+          <span class="suggestion-exchange">${r.exchange}</span>
+        </div>`).join("");
+    } catch { box.innerHTML = ""; }
+  }, 350);
+}
+
+function selectTicker(symbol, name) {
+  selectedTicker = symbol;
+  selectedName   = name;
+  document.getElementById("ticker-input").value = `${symbol} — ${name}`;
+  document.getElementById("suggestions").innerHTML = "";
+}
+
+// ── Load analysis ──────────────────────────────────
+async function loadAnalysis() {
+  const inputVal = document.getElementById("ticker-input").value.trim();
+  const ticker   = selectedTicker || inputVal.split("—")[0].trim().toUpperCase();
+  const period   = document.getElementById("period-select").value;
+  if (!ticker) { showError("Please enter or select a company."); return; }
+  window.location.href = `/analysis/${ticker}?period=${period}`;
+}
+
+async function fetchAnalysis(ticker, period) {
+  setProgress(20);
+  showLoading(true);
+  try {
+    setProgress(50);
+    const res = await fetch(`${API}/stock/${ticker}/analysis?period=${period}`);
+    setProgress(80);
+    if (!res.ok) throw new Error(`Could not find data for "${ticker}".`);
+    const data = await res.json();
+    selectedTicker = ticker;
+    selectedName   = data.ticker;
+    render(data);
+    setProgress(100);
+  } catch (err) {
+    showError(err.message);
+    setProgress(100);
+  } finally {
+    showLoading(false);
+  }
+}
+
+// ── Render ─────────────────────────────────────────
+function render(data) {
+  document.title = `${data.ticker} Analysis — Deep Market Inspection`;
+  const breadcrumb = document.getElementById("analysis-breadcrumb");
+  if (breadcrumb) breadcrumb.textContent = `${data.ticker} · ${data.period} Analysis`;
+
+  const isIndian = selectedTicker.endsWith(".NS") || selectedTicker.endsWith(".BO");
+  const currency = isIndian ? "₹" : "$";
+
+  const cards = document.getElementById("summary-cards");
+  cards.innerHTML = `
+    <div class="glass-card stat-card"><p class="card-label">Ticker</p><p class="card-value">${data.ticker}</p></div>
+    <div class="glass-card stat-card"><p class="card-label">Company</p><p class="card-value" style="font-size:15px">${selectedName || data.ticker}</p></div>
+    <div class="glass-card stat-card"><p class="card-label">Latest Price</p><p class="card-value">${currency}${data.latest_price}</p></div>
+    <div class="glass-card stat-card"><p class="card-label">Overall Signal</p><p class="card-value ${data.summary}">${data.summary}</p></div>
+    <div class="glass-card stat-card"><p class="card-label">Period</p><p class="card-value">${data.period}</p></div>
+  `;
+
+  document.getElementById("action-bar").style.display = "flex";
+  saveHistory(data.ticker, data.period, data.summary);
+
+  const grid = document.getElementById("signals-grid");
+  grid.innerHTML = data.signals.map(s => `
+    <div class="signal-card ${s.signal}">
+      <div class="signal-name">${s.indicator}</div>
+      <div class="signal-badge">${s.signal}</div>
+      <div class="signal-reason">${s.reason}</div>
+    </div>`).join("");
+  document.getElementById("signals-section").style.display = "block";
+
+  const dates  = data.data.map(d => d.Date);
+  const opens  = data.data.map(d => d.Open);
+  const highs  = data.data.map(d => d.High);
+  const lows   = data.data.map(d => d.Low);
+  const closes = data.data.map(d => d.Close);
+
+  const layout = {
+    paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+    font: { color: "#f0f0ff", family: "Segoe UI, sans-serif" },
+    xaxis: { gridcolor: "rgba(255,255,255,0.06)" },
+    yaxis: { gridcolor: "rgba(255,255,255,0.06)" },
+    margin: { t:16, b:40, l:60, r:20 }, height: 340,
+    legend: { bgcolor: "rgba(0,0,0,0)", font: { color: "#f0f0ff" } }
+  };
+
+  Plotly.newPlot("candlestick-chart", [{
+    type: "candlestick", x: dates, open: opens, high: highs, low: lows, close: closes,
+    increasing: { line: { color: "#22c55e" } }, decreasing: { line: { color: "#ef4444" } }
+  }], { ...layout, height: 420 });
+
+  Plotly.newPlot("rsi-chart", [
+    { x: dates, y: data.data.map(d => d.RSI), type:"scatter", name:"RSI", line:{color:"#a78bfa"} },
+    { x: dates, y: Array(dates.length).fill(70), name:"Overbought", line:{color:"#ef4444",dash:"dash"} },
+    { x: dates, y: Array(dates.length).fill(30), name:"Oversold", line:{color:"#22c55e",dash:"dash"} }
+  ], layout);
+
+  Plotly.newPlot("macd-chart", [
+    { x: dates, y: data.data.map(d => d.MACD), type:"scatter", name:"MACD", line:{color:"#4fb8f7"} },
+    { x: dates, y: data.data.map(d => d.MACD_signal), type:"scatter", name:"Signal", line:{color:"#f59e0b"} },
+    { x: dates, y: data.data.map(d => d.MACD_diff), type:"bar", name:"Diff", marker:{color:"#6366f1"} }
+  ], layout);
+
+  Plotly.newPlot("bb-chart", [
+    { x: dates, y: data.data.map(d => d.BB_upper), name:"Upper", line:{color:"#ef4444",dash:"dot"} },
+    { x: dates, y: data.data.map(d => d.BB_middle), name:"Middle", line:{color:"#f59e0b"} },
+    { x: dates, y: data.data.map(d => d.BB_lower), name:"Lower", line:{color:"#22c55e",dash:"dot"} },
+    { x: dates, y: closes, name:"Close", line:{color:"#ffffff"} }
+  ], layout);
+
+  document.getElementById("charts-section").style.display = "block";
+  loadNews(data.ticker);
+}
+
+// ── News ───────────────────────────────────────────
+async function loadNews(ticker) {
+  try {
+    const res   = await fetch(`${API}/stock/${ticker}/news`);
+    const items = await res.json();
+    const grid  = document.getElementById("news-section");
+    if (!items.length) { grid.innerHTML = ""; return; }
+    grid.innerHTML = items.map(n => `
+      <a class="news-card glass-card" href="${n.url}" target="_blank" rel="noopener">
+        <p class="news-source">${n.source}</p>
+        <p class="news-title">${n.title}</p>
+        <p class="news-summary">${n.summary}</p>
+      </a>`).join("");
+  } catch {}
+}
+
+// ── Helpers ────────────────────────────────────────
+function showLoading(on) {
+  document.getElementById("loading").style.display = on ? "block" : "none";
+}
+
+function showError(msg) {
+  const el = document.getElementById("error-msg");
+  el.textContent = `⚠️ ${msg}`;
+  el.style.display = "block";
+}
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".search-wrapper"))
+    document.getElementById("suggestions").innerHTML = "";
+});
+
+document.getElementById("ticker-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") loadAnalysis();
+});
+
+// ── Boot: read ticker from URL ─────────────────────
+const pathParts = window.location.pathname.split("/");
+const urlTicker = pathParts[2] ? pathParts[2].toUpperCase() : null;
+const urlPeriod = new URLSearchParams(window.location.search).get("period") || "6mo";
+
+if (urlTicker) {
+  selectedTicker = urlTicker;
+  selectedName   = urlTicker;
+  document.getElementById("ticker-input").value = urlTicker;
+  const sel = document.getElementById("period-select");
+  if (sel) sel.value = urlPeriod;
+  fetchAnalysis(urlTicker, urlPeriod);
+} else {
+  window.location.href = "/";
+}
