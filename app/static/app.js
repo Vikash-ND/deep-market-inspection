@@ -310,7 +310,12 @@ const chgEl = document.getElementById("card-change");
     { x: dates, y: closes, name: "Close", line: { color: "#ffffff" } }
   ], layout);
 
-  document.getElementById("charts-section").style.display = "block";
+  document.getElementById("charts-section").style.display = "block";setTimeout(() => {
+    document.getElementById("summary-cards").scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }, 100);
 document.getElementById("action-bar").style.display = "flex";
   saveHistory(data.ticker, data.period, data.summary);
 loadNews(data.ticker);
