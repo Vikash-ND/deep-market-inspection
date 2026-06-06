@@ -24,14 +24,16 @@ def get_stock_info(ticker: str) -> dict:
             change_pct = round(((float(price) - float(prev_close)) / float(prev_close)) * 100, 2)
 
         result = {
-            "symbol":     ticker.upper(),
-            "name":       info.get("longName") or info.get("shortName", "N/A"),
-            "price":      round(float(price), 2) if price else None,
-            "change_pct": change_pct,
-            "currency":   info.get("currency", "USD"),
-            "market_cap": info.get("marketCap"),
-            "volume":     info.get("volume"),
-            "sector":     info.get("sector", "N/A"),
+            "symbol":      ticker.upper(),
+            "name":        info.get("longName") or info.get("shortName", "N/A"),
+            "price":       round(float(price), 2) if price else None,
+            "change_pct":  change_pct,
+            "week52_high": info.get("fiftyTwoWeekHigh"),
+            "week52_low":  info.get("fiftyTwoWeekLow"),
+            "currency":    info.get("currency", "USD"),
+            "market_cap":  info.get("marketCap"),
+            "volume":      info.get("volume"),
+            "sector":      info.get("sector", "N/A"),
         }
         set_cache(key, result)
         return result
