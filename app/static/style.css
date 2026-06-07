@@ -905,3 +905,52 @@ kbd {
   font-size: 11px;
   font-family: monospace;
 }
+
+/* ── Light mode ── */
+body.light {
+  background: #f0f2f8;
+  color: #1a1a2e;
+}
+
+body.light .glass-card {
+  background: rgba(255,255,255,0.7);
+  border-color: rgba(0,0,0,0.08);
+}
+
+body.light .glass-header {
+  background: rgba(240,242,248,0.9);
+  border-color: rgba(0,0,0,0.08);
+}
+
+body.light .card-label  { color: rgba(0,0,0,0.5); }
+body.light .card-value  { color: #1a1a2e; }
+body.light .muted       { color: rgba(0,0,0,0.4); }
+
+body.light .search-wrapper input,
+body.light #period-select,
+body.light .header-search select {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.12);
+  color: #1a1a2e;
+}
+
+body.light .ticker-tape { background: rgba(0,0,0,0.03); }
+body.light .stock-row   { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.06); }
+body.light .stock-row:hover { background: rgba(124,110,247,0.08); }
+body.light .signal-card { background: rgba(255,255,255,0.6); }
+body.light .suggestions { background: rgba(240,242,248,0.98); }
+body.light .suggestion-item:hover { background: rgba(124,110,247,0.08); }
+body.light .orb { opacity: 0.08; }
+body.light #candle-canvas { opacity: 0.08; }
+
+/* ── Theme toggle button ── */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.08); }

@@ -11,6 +11,22 @@ let searchTimer = null;
 let selectedTicker = "";
 let selectedName = "";
 
+// ── Theme toggle ───────────────────────────────────
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light");
+  localStorage.setItem("dmi_theme", isLight ? "light" : "dark");
+  document.getElementById("theme-toggle").textContent = isLight ? "☀️" : "🌙";
+}
+
+// Apply saved theme on load
+(function() {
+  if (localStorage.getItem("dmi_theme") === "light") {
+    document.body.classList.add("light");
+    const btn = document.getElementById("theme-toggle");
+    if (btn) btn.textContent = "☀️";
+  }
+})();
+
 // ── Clock ──────────────────────────────────────────
 function updateClock() {
   const now = new Date();
