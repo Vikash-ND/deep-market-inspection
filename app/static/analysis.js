@@ -283,6 +283,7 @@ function render(data) {
 
   document.getElementById("charts-section").style.display = "block";
   loadNews(data.ticker);
+saveRecentlyViewed(data.ticker, selectedName);
 }
 
 // ── News ───────────────────────────────────────────
@@ -331,4 +332,12 @@ if (urlTicker) {
   fetchAnalysis(urlTicker, urlPeriod);
 } else {
   window.location.href = "/";
+}
+
+function saveRecentlyViewed(ticker, name) {
+  let recent = JSON.parse(localStorage.getItem("dmi_recent") || "[]");
+  recent     = recent.filter(r => r.ticker !== ticker);
+  recent.unshift({ ticker, name });
+  recent     = recent.slice(0, 6);
+  localStorage.setItem("dmi_recent", JSON.stringify(recent));
 }

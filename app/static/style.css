@@ -856,3 +856,33 @@ main {
 }
 .compare-nav-btn:hover { color: var(--text); border-color: var(--accent); }
 .compare-nav-btn:hover { color: var(--text); border-color: var(--accent); }
+
+/* ── Recently viewed ── */
+.recently-viewed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.recent-label {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+#recent-chips { display:flex;gap:8px;flex-wrap:wrap; }
+
+.recent-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.04);
+  color: var(--accent2);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.recent-chip:hover { background:rgba(124,110,247,0.15);transform:translateY(-1px); }

@@ -364,3 +364,16 @@ async function loadNews(ticker) {
     `).join("");
   } catch { }
 }
+
+function renderRecentlyViewed() {
+  const recent = JSON.parse(localStorage.getItem("dmi_recent") || "[]");
+  const section = document.getElementById("recently-viewed");
+  if (!section || !recent.length) return;
+  section.style.display = "block";
+  document.getElementById("recent-chips").innerHTML = recent.map(r => `
+    <button class="recent-chip" onclick="quickLoad('${r.ticker}','${r.name}')">
+      ${r.ticker}
+    </button>`).join("");
+}
+
+renderRecentlyViewed();
