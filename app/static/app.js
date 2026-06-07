@@ -377,3 +377,22 @@ function renderRecentlyViewed() {
 }
 
 renderRecentlyViewed();
+
+// ── Keyboard shortcuts ─────────────────────────────
+document.addEventListener("keydown", e => {
+  const active = document.activeElement;
+  const isTyping = active.tagName === "INPUT" || active.tagName === "TEXTAREA";
+
+  // Press "/" to focus search
+  if (e.key === "/" && !isTyping) {
+    e.preventDefault();
+    const input = document.getElementById("ticker-input");
+    if (input) { input.focus(); input.select(); }
+  }
+
+  // Press Escape to close modal/clear search
+  if (e.key === "Escape") {
+    closeModal?.();
+    document.getElementById("suggestions").innerHTML = "";
+  }
+});
