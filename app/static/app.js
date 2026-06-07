@@ -1,4 +1,5 @@
-const API = window.location.origin + "/api/v1";// ── Progress bar ───────────────────────────────────
+const API = window.location.origin + "/api/v1";
+// ── Progress bar ───────────────────────────────────
 function setProgress(pct) {
   const bar = document.getElementById("progress-bar");
   if (!bar) return;

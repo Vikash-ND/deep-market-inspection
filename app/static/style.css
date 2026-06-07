@@ -954,3 +954,50 @@ body.light #candle-canvas { opacity: 0.08; }
   transition: background 0.2s;
 }
 .theme-toggle:hover { background: rgba(255,255,255,0.08); }
+
+/* ── Fullscreen chart ── */
+.chart-wrapper {
+  position: relative;
+}
+
+.fullscreen-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 4px 8px;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s, color 0.2s;
+}
+.fullscreen-btn:hover { background: rgba(255,255,255,0.15); color: var(--text); }
+
+.chart-fullscreen-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(7,11,20,0.97);
+  z-index: 500;
+  padding: 24px;
+  flex-direction: column;
+}
+
+.chart-fullscreen-overlay.active { display: flex; }
+
+.fullscreen-close {
+  align-self: flex-end;
+  background: none;
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+#fullscreen-chart-container { flex: 1; }

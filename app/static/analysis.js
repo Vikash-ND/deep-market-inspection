@@ -357,3 +357,26 @@ function toggleTheme() {
     if (btn) btn.textContent = "☀️";
   }
 })();
+
+// ── Fullscreen chart ───────────────────────────────
+function openFullscreen(chartId) {
+  const overlay     = document.getElementById("fullscreen-overlay");
+  const container   = document.getElementById("fullscreen-chart-container");
+  const chartEl     = document.getElementById(chartId);
+  overlay.classList.add("active");
+  container.innerHTML = "";
+  const clone = chartEl.cloneNode(true);
+  clone.id    = "fullscreen-inner";
+  clone.style.height = "100%";
+  container.appendChild(clone);
+  Plotly.relayout(chartEl.id, {});
+  setTimeout(() => Plotly.Plots.resize(clone), 100);
+}
+
+function closeFullscreen() {
+  document.getElementById("fullscreen-overlay").classList.remove("active");
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeFullscreen();
+});

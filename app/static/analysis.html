@@ -9,6 +9,11 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
 </head>
 <body>
+<!-- Fullscreen chart overlay -->
+    <div class="chart-fullscreen-overlay" id="fullscreen-overlay">
+    <button class="fullscreen-close" onclick="closeFullscreen()">✕ Close Fullscreen</button>
+    <div id="fullscreen-chart-container"></div>
+  </div>
 
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
@@ -126,20 +131,34 @@
 
     <!-- Charts -->
     <section id="charts-section" style="display:none">
-      <h2 class="section-title">🕯️ Candlestick Chart</h2>
-      <div class="glass-card chart-card" id="candlestick-chart"></div>
+       <h2 class="section-title">🕯️ Candlestick Chart</h2>
+      <div class="chart-wrapper">
+        <button class="fullscreen-btn" onclick="openFullscreen('candlestick-chart')">⛶ Fullscreen</button>
+        <div class="glass-card chart-card" id="candlestick-chart"></div>
+      </div>
       <div class="chart-row">
-        <div class="chart-half">
-          <h2 class="section-title">📊 RSI</h2>
+         <div class="chart-half">
+        <h2 class="section-title">📊 RSI</h2>
+        <div class="chart-wrapper">
+          <button class="fullscreen-btn" onclick="openFullscreen('rsi-chart')">⛶ Fullscreen</button>
           <div class="glass-card chart-card" id="rsi-chart"></div>
         </div>
-        <div class="chart-half">
-          <h2 class="section-title">📉 MACD</h2>
+      </div>
+        </div>
+         <div class="chart-half">
+        <h2 class="section-title">📉 MACD</h2>
+        <div class="chart-wrapper">
+          <button class="fullscreen-btn" onclick="openFullscreen('macd-chart')">⛶ Fullscreen</button>
           <div class="glass-card chart-card" id="macd-chart"></div>
         </div>
       </div>
+        </div>
+      </div>
       <h2 class="section-title">🎯 Bollinger Bands</h2>
-      <div class="glass-card chart-card" id="bb-chart"></div>
+      <div class="chart-wrapper">
+        <button class="fullscreen-btn" onclick="openFullscreen('bb-chart')">⛶ Fullscreen</button>
+        <div class="glass-card chart-card" id="bb-chart"></div>
+      </div> 
       <h2 class="section-title">📰 Latest News</h2>
       <div id="news-section" class="news-grid"></div>
     </section>
