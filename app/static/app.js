@@ -413,3 +413,12 @@ document.addEventListener("keydown", e => {
     document.getElementById("suggestions").innerHTML = "";
   }
 });
+
+// ── PWA Service Worker ─────────────────────────────
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/static/service-worker.js")
+      .then(() => console.log("PWA: Service Worker registered ✅"))
+      .catch(err => console.log("PWA: SW failed:", err));
+  });
+}

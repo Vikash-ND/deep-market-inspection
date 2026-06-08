@@ -56,3 +56,7 @@ def root():
 @app.get("/compare")
 def compare_page():
     return FileResponse("app/static/compare.html")
+
+@app.get("/static/service-worker.js")
+def sw():
+    return FileResponse("app/static/service-worker.js")
