@@ -1,7 +1,6 @@
-\# 📈 Deep Market Inspection
+![CI](https://github.com/Vikash-ND/deep-market-inspection/actions/workflows/test.yml/badge.svg)
 
-
-
+# 📈 Deep Market Inspection
 A real-time stock market analysis platform built with \*\*FastAPI\*\* and \*\*Python\*\*.
 
 Search any company by name, view live price data, and get technical indicator signals.
