@@ -1,23 +1,23 @@
 from fastapi.testclient import TestClient
-from unittest.mock import patch, MagicMock
 from app.main import app
 
 client = TestClient(app)
 
-# ── Basic route tests (no external API needed) ─────
-
-def test_root():
-    res = client.get("/")
-    assert res.status_code == 200
-
 def test_health():
     res = client.get("/health")
     assert res.status_code == 200
-    data = res.json()
-    assert data["status"] == "healthy"
+    assert res.json()["status"] == "healthy"
 
 def test_docs():
     res = client.get("/docs")
+    assert res.status_code == 200
+
+def test_openapi():
+    res = client.get("/openapi.json")
+    assert res.status_code == 200
+
+def test_root():
+    res = client.get("/")
     assert res.status_code == 200
 
 def test_analysis_page():

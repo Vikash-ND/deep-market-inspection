@@ -60,3 +60,15 @@ def compare_page():
 @app.get("/static/service-worker.js")
 def sw():
     return FileResponse("app/static/service-worker.js")
+
+@app.get("/portfolio")
+def portfolio_page():
+    return FileResponse("app/static/portfolio.html")
+
+@app.get("/robots.txt")
+def robots():
+    return FileResponse("app/static/robots.txt")
+
+@app.get("/sitemap.xml")
+def sitemap():
+    return FileResponse("app/static/sitemap.xml")
