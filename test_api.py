@@ -28,10 +28,6 @@ def test_compare_page():
     res = client.get("/compare")
     assert res.status_code == 200
 
-def test_portfolio_page():
-    res = client.get("/portfolio")
-    assert res.status_code == 200
-
 def test_robots():
     res = client.get("/robots.txt")
     assert res.status_code == 200

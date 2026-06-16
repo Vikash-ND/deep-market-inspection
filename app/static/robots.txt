@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://deep-market-inspection.onrender.com/sitemap.xml
