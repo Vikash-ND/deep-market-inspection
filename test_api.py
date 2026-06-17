@@ -43,3 +43,7 @@ def test_search_missing_query():
 def test_compare_missing_tickers():
     res = client.get("/api/v1/stocks/compare")
     assert res.status_code == 422
+
+def test_portfolio_page():
+    res = client.get("/portfolio")
+    assert res.status_code == 200

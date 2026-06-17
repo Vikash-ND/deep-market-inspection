@@ -72,3 +72,7 @@ def robots():
 @app.get("/sitemap.xml")
 def sitemap():
     return FileResponse("app/static/sitemap.xml")
+
+@app.get("/portfolio")
+def portfolio_page():
+    return FileResponse("app/static/portfolio.html")
