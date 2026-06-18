@@ -94,3 +94,59 @@ def stock_news(ticker: str):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/stock/{ticker}/related")
+def related_stocks(ticker: str):    
+    try:
+        RELATED_MAP = {
+            # US Tech
+            "AAPL":  ["MSFT", "GOOGL", "META", "AMZN"],
+            "MSFT":  ["AAPL", "GOOGL", "AMZN", "NVDA"],
+            "GOOGL": ["MSFT", "META", "AMZN", "AAPL"],
+            "META":  ["GOOGL", "SNAP", "PINS", "TWTR"],
+            "NVDA":  ["AMD", "INTC", "QCOM", "TSM"],
+            "AMZN":  ["MSFT", "GOOGL", "AAPL", "SHOP"],
+            "TSLA":  ["GM", "F", "NIO", "RIVN"],
+            "JPM":   ["BAC", "GS", "MS", "WFC"],
+
+            # Indian stocks
+            "RELIANCE.NS":   ["TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS"],
+            "TCS.NS":        ["INFY.NS", "WIPRO.NS", "HCLTECH.NS", "TECHM.NS"],
+            "INFY.NS":       ["TCS.NS", "WIPRO.NS", "HCLTECH.NS", "TECHM.NS"],
+            "HDFCBANK.NS":   ["ICICIBANK.NS", "SBIN.NS", "AXISBANK.NS", "KOTAKBANK.NS"],
+            "ICICIBANK.NS":  ["HDFCBANK.NS", "SBIN.NS", "AXISBANK.NS", "KOTAKBANK.NS"],
+            "WIPRO.NS":      ["TCS.NS", "INFY.NS", "HCLTECH.NS", "TECHM.NS"],
+            "ADANIENT.NS":   ["ADANIPORTS.NS", "ADANIPOWER.NS", "RELIANCE.NS"],
+            "BAJFINANCE.NS": ["HDFCBANK.NS", "ICICIBANK.NS", "SBIN.NS"],
+        }
+
+        related_tickers = RELATED_MAP.get(ticker.upper(), [])
+
+        if not related_tickers:
+            stock    = yf.Ticker(ticker)
+            info     = stock.info
+            sector   = info.get("sector", "")
+            related_tickers = []
+
+        results = []
+        for t in related_tickers[:4]:
+            try:
+                s    = yf.Ticker(t)
+                info = s.info
+                price = (
+                    info.get("currentPrice") or
+                    info.get("regularMarketPrice") or
+                    info.get("previousClose")
+                )
+                results.append({
+                    "symbol": t,
+                    "name":   info.get("longName") or info.get("shortName", t),
+                    "price":  round(float(price), 2) if price else None,
+                    "currency": info.get("currency", "USD")
+                })
+            except:
+                continue
+
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

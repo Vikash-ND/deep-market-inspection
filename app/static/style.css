@@ -1001,3 +1001,43 @@ body.light #candle-canvas { opacity: 0.08; }
 }
 
 #fullscreen-chart-container { flex: 1; }
+
+/* ── Related stocks ── */
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.related-card {
+  padding: 18px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  text-align: center;
+}
+
+.related-card:hover {
+  transform: translateY(-3px);
+  background: rgba(124,110,247,0.1);
+}
+
+.related-symbol {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--accent2);
+  margin-bottom: 6px;
+}
+
+.related-name {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.related-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}

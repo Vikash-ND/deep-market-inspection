@@ -283,7 +283,31 @@ function render(data) {
 
   document.getElementById("charts-section").style.display = "block";
   loadNews(data.ticker);
+  loadRelatedStocks(data.ticker);
 saveRecentlyViewed(data.ticker, selectedName);
+}
+
+// ── Related stocks ─────────────────────────────────
+async function loadRelatedStocks(ticker) {
+  try {
+    const res   = await fetch(`${API}/stock/${ticker}/related`);
+    const items = await res.json();
+    const grid  = document.getElementById("related-section");
+    if (!grid || !items.length) return;
+
+    grid.innerHTML = items.map(stock => {
+      const currency = stock.symbol.endsWith(".NS") || stock.symbol.endsWith(".BO") ? "₹" : "$";
+      const price    = stock.price ? `${currency}${stock.price}` : "N/A";
+      const sym      = stock.symbol.replace(".NS","").replace(".BO","");
+      return `
+        <div class="related-card glass-card"
+             onclick="window.location.href='/analysis/${stock.symbol}'">
+          <p class="related-symbol">${sym}</p>
+          <p class="related-name">${stock.name}</p>
+          <p class="related-price">${price}</p>
+        </div>`;
+    }).join("");
+  } catch {}
 }
 
 // ── News ───────────────────────────────────────────
