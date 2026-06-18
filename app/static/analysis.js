@@ -208,6 +208,14 @@ function render(data) {
       <p class="card-label">Period</p>
       <p class="card-value">${data.period}</p>
     </div>
+    <div class="glass-card stat-card">
+      <p class="card-label">Volume</p>
+      <p class="card-value" style="font-size:15px">${data.volume ? formatVolume(data.volume) : "N/A"}</p>
+    </div>
+    <div class="glass-card stat-card">
+      <p class="card-label">Avg Volume</p>
+      <p class="card-value" style="font-size:15px">${data.avg_volume ? formatVolume(data.avg_volume) : "N/A"}</p>
+    </div>
   `;
 
   // Action bar
@@ -404,3 +412,10 @@ function closeFullscreen() {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeFullscreen();
 });
+
+function formatVolume(vol) {
+  if (vol >= 1_000_000_000) return `${(vol / 1_000_000_000).toFixed(1)}B`;
+  if (vol >= 1_000_000)     return `${(vol / 1_000_000).toFixed(1)}M`;
+  if (vol >= 1_000)         return `${(vol / 1_000).toFixed(1)}K`;
+  return vol.toString();
+}

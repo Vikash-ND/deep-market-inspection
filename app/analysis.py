@@ -81,19 +81,48 @@ def get_full_analysis(ticker: str, period: str = "6mo") -> dict:
         "BB_upper", "BB_middle", "BB_lower"
     ]
 
+    avg_vol  = hist["Volume"].rolling(window=20).mean().iloc[-1]
+    curr_vol = int(latest["Volume"])
+
     result = {
-        "ticker": ticker.upper(),
-        "period": period,
-        "latest_price": round(latest["Close"], 2),
-        "signals": signals,
-        "summary": summarize_signals(signals),
-        "data": hist[columns].to_dict(orient="records")
-    }
+            "ticker":       ticker.upper(),
+            "period":       period,
+            "latest_price": round(latest["Close"], 2),
+            "signals":      signals,
+            "summary":      summarize_signals(signals),
+            "volume":       curr_vol,
+            "avg_volume":   int(avg_vol) if avg_vol else None,
+            "data":         hist[columns].to_dict(orient="records")
+        }
 
     set_cache(key, result)
     return result
 
 
+# --- Volume Signal ---
+avg_volume = hist["Volume"].rolling(window=20).mean().iloc[-1]
+curr_volume = latest["Volume"]
+if avg_volume and curr_volume:
+            vol_ratio = curr_volume / avg_volume
+            if vol_ratio > 1.5:
+                signals.append({
+                    "indicator": "Volume",
+                    "signal": "BUY",
+                    "reason": f"Volume {round(vol_ratio, 1)}x above average — unusual activity"
+                })
+            elif vol_ratio < 0.5:
+                signals.append({
+                    "indicator": "Volume",
+                    "signal": "NEUTRAL",
+                    "reason": f"Volume {round(vol_ratio, 1)}x below average — low activity"
+                })
+            else:
+                signals.append({
+                    "indicator": "Volume",
+                    "signal": "NEUTRAL",
+                    "reason": f"Volume normal ({round(vol_ratio, 1)}x average)"
+                })
+                
 def summarize_signals(signals: list) -> str:
     counts = {"BUY": 0, "SELL": 0, "NEUTRAL": 0}
     for s in signals:
