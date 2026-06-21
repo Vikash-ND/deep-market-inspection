@@ -422,3 +422,32 @@ if ("serviceWorker" in navigator) {
       .catch(err => console.log("PWA: SW failed:", err));
   });
 }
+// ── Stock of the Day ───────────────────────────────
+let sodTicker = "";
+
+async function loadStockOfDay() {
+  try {
+    const res  = await fetch(`${API}/stock-of-the-day`);
+    const data = await res.json();
+    sodTicker  = data.ticker;
+
+    document.getElementById("sod-ticker").textContent = data.ticker.replace(".NS","");
+    document.getElementById("sod-price").textContent  = `${data.currency}${data.price}`;
+
+    const summaryEl = document.getElementById("sod-signal");
+    summaryEl.textContent = data.summary;
+    summaryEl.className   = `sod-signal ${data.summary}`;
+
+    document.getElementById("sod-reason").textContent =
+      data.top_signal ? `${data.top_signal.indicator}: ${data.top_signal.reason}` : "";
+
+    document.getElementById("stock-of-day").style.display = "block";
+  } catch (err) {
+    console.error("Stock of Day error:", err);
+  }
+}
+function goToStockOfDay() {
+  if (sodTicker) window.location.href = `/analysis/${sodTicker}`;
+}
+
+loadStockOfDay();

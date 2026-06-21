@@ -150,3 +150,31 @@ def related_stocks(ticker: str):
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+import random
+from datetime import date
+
+@router.get("/stock-of-the-day")
+def stock_of_the_day():
+    try:
+        candidates = [
+            "AAPL", "MSFT", "GOOGL", "AMZN", "META", "NVDA", "TSLA",
+            "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "WIPRO.NS"
+        ]
+
+        # Deterministic pick based on today's date so it stays the same all day
+        today_seed = date.today().toordinal()
+        ticker = candidates[today_seed % len(candidates)]
+
+        from app.analysis import get_full_analysis
+        result = get_full_analysis(ticker, period="3mo")
+
+        return {
+            "ticker":  result["ticker"],
+            "price":   result["latest_price"],
+            "summary": result["summary"],
+            "top_signal": result["signals"][0] if result["signals"] else None,
+            "currency": "₹" if ticker.endswith(".NS") else "$"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
