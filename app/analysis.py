@@ -98,38 +98,37 @@ def get_full_analysis(ticker: str, period: str = "6mo") -> dict:
     set_cache(key, result)
     return result
 
-
-# --- Volume Signal ---
-avg_volume = hist["Volume"].rolling(window=20).mean().iloc[-1]
-curr_volume = latest["Volume"]
-if avg_volume and curr_volume:
-            vol_ratio = curr_volume / avg_volume
-            if vol_ratio > 1.5:
-                signals.append({
-                    "indicator": "Volume",
-                    "signal": "BUY",
-                    "reason": f"Volume {round(vol_ratio, 1)}x above average — unusual activity"
-                })
-            elif vol_ratio < 0.5:
-                signals.append({
-                    "indicator": "Volume",
-                    "signal": "NEUTRAL",
-                    "reason": f"Volume {round(vol_ratio, 1)}x below average — low activity"
-                })
-            else:
-                signals.append({
-                    "indicator": "Volume",
-                    "signal": "NEUTRAL",
-                    "reason": f"Volume normal ({round(vol_ratio, 1)}x average)"
-                })
-                
-def summarize_signals(signals: list) -> str:
-    counts = {"BUY": 0, "SELL": 0, "NEUTRAL": 0}
-    for s in signals:
-        counts[s["signal"]] += 1
-    if counts["BUY"] > counts["SELL"]:
-        return "BULLISH"
-    elif counts["SELL"] > counts["BUY"]:
-        return "BEARISH"
-    else:
-        return "NEUTRAL"
+ # --- Volume Signal ---
+    avg_volume = hist["Volume"].rolling(window=20).mean().iloc[-1]
+    curr_volume = latest["Volume"]
+    if avg_volume and curr_volume:
+                vol_ratio = curr_volume / avg_volume
+                if vol_ratio > 1.5:
+                    signals.append({
+                        "indicator": "Volume",
+                        "signal": "BUY",
+                        "reason": f"Volume {round(vol_ratio, 1)}x above average — unusual activity"
+                    })
+                elif vol_ratio < 0.5:
+                    signals.append({
+                        "indicator": "Volume",
+                        "signal": "NEUTRAL",
+                        "reason": f"Volume {round(vol_ratio, 1)}x below average — low activity"
+                    })
+                else:
+                    signals.append({
+                        "indicator": "Volume",
+                        "signal": "NEUTRAL",
+                        "reason": f"Volume normal ({round(vol_ratio, 1)}x average)"
+                    })
+                    
+    def summarize_signals(signals: list) -> str:
+        counts = {"BUY": 0, "SELL": 0, "NEUTRAL": 0}
+        for s in signals:
+            counts[s["signal"]] += 1
+        if counts["BUY"] > counts["SELL"]:
+            return "BULLISH"
+        elif counts["SELL"] > counts["BUY"]:
+            return "BEARISH"
+        else:
+            return "NEUTRAL"
