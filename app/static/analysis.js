@@ -419,3 +419,16 @@ function formatVolume(vol) {
   if (vol >= 1_000)         return `${(vol / 1_000).toFixed(1)}K`;
   return vol.toString();
 }
+
+// ── Export PDF ─────────────────────────────────────
+function downloadPDF() {
+  if (!selectedTicker) return;
+  const period = document.getElementById("period-select").value;
+  const link = document.createElement("a");
+  link.href = `${API}/stock/${selectedTicker}/analysis/pdf?period=${period}`;
+  link.download = `${selectedTicker}_analysis.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast("Downloading PDF report... 📄");
+}

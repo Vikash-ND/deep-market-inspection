@@ -1,3 +1,5 @@
+from fastapi.responses import StreamingResponse
+from app.pdf_export import generate_analysis_pdf
 from fastapi import APIRouter, HTTPException, Query
 from app.data import get_stock_info, get_stock_history, get_multiple_stocks
 from app.analysis import get_full_analysis
@@ -176,5 +178,18 @@ def stock_of_the_day():
             "top_signal": result["signals"][0] if result["signals"] else None,
             "currency": "₹" if ticker.endswith(".NS") else "$"
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/stock/{ticker}/analysis/pdf")
+def download_analysis_pdf(ticker: str, period: str = Query(default="6mo")):
+    try:
+        data = get_full_analysis(ticker, period)
+        pdf_buffer = generate_analysis_pdf(data)
+        return StreamingResponse(
+            pdf_buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={ticker}_analysis.pdf"}
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
