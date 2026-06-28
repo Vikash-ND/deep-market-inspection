@@ -1101,3 +1101,42 @@ body.light #candle-canvas { opacity: 0.08; }
   transition: opacity 0.2s;
 }
 .sod-btn:hover { opacity: 0.85; } 
+
+/* ── 404 page ── */
+.error-404-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.error-404-code {
+  font-size: 96px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.error-404-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+.error-404-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+.error-404-btn {
+  padding: 12px 28px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+.error-404-btn:hover { opacity: 0.85; }

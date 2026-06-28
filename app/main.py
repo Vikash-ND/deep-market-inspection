@@ -1,3 +1,5 @@
+from fastapi.responses import FileResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -9,6 +11,7 @@ from app.routers import router
 from app.user_routes import router as user_router
 from app.cache import init_db
 from app.auth import init_user_db
+from fastapi.responses import JSONResponse
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -17,6 +20,12 @@ app = FastAPI(
     description="Real-time stock analysis and technical indicator engine",
     version="3.0.0"
 )
+
+@app.exception_handler(404)
+async def custom_404_handler(request: Request, exc: StarletteHTTPException):
+    if request.url.path.startswith("/api/"):
+        return JSONResponse(status_code=404, content={"detail": "Not Found"})
+    return FileResponse("app/static/404.html", status_code=404)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
