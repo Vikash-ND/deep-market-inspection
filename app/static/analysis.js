@@ -432,3 +432,13 @@ function downloadPDF() {
   document.body.removeChild(link);
   showToast("Downloading PDF report... 📄");
 }
+
+// ── Share link ──────────────────────────────────────
+function shareLink() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast("Link copied to clipboard! 🔗");
+  }).catch(() => {
+    showToast("Could not copy link", true);
+  });
+}
